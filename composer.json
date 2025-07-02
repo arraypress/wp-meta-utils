@@ -1,0 +1,43 @@
+{
+  "name": "arraypress/wp-meta-utils",
+  "version": "1.0.0",
+  "description": "A lightweight WordPress library for comprehensive meta data management across all meta types with advanced operations and type safety.",
+  "type": "library",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/arraypress/wp-option-utils/",
+  "authors": [
+    {
+      "name": "David Sherlock",
+      "homepage": "https://arraypress.com/"
+    }
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "ArrayPress\\MetaUtils\\": "src/"
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true,
+    "preferred-install": "dist"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "support": {
+    "issues": "https://github.com/arraypress/wp-meta-utils/issues",
+    "source": "https://github.com/arraypress/wp-meta-utils"
+  },
+  "keywords": [
+    "wordpress",
+    "meta",
+    "metadata",
+    "post-meta",
+    "user-meta",
+    "term-meta",
+    "comment-meta",
+    "arraypress"
+  ]
+}
