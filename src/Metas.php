@@ -3,7 +3,7 @@
  * Metas Utility Class
  *
  * Provides utility functions for working with multiple WordPress meta entries,
- * including bulk operations and essential pattern-based operations.
+ * including bulk operations, relationship management, and essential pattern-based operations.
  *
  * @package ArrayPress\MetaUtils
  * @since   1.0.0
@@ -18,7 +18,7 @@ namespace ArrayPress\MetaUtils;
 /**
  * Metas Class
  *
- * Operations for working with multiple WordPress meta entries.
+ * Operations for working with multiple WordPress meta entries and relationships.
  */
 class Metas {
 
@@ -112,6 +112,49 @@ class Metas {
 		return array_reduce( $meta_keys, function ( $count, $meta_key ) use ( $meta_type, $object_id ) {
 			return $count + ( Meta::delete( $meta_type, $object_id, $meta_key ) ? 1 : 0 );
 		}, 0 );
+	}
+
+	// ========================================
+	// Object Sync
+	// ========================================
+
+	/**
+	 * Sync object properties with WordPress metadata.
+	 *
+	 * @param object $object      Object to sync.
+	 * @param int    $object_id   WordPress object ID.
+	 * @param array  $field_map   Property to meta key mapping.
+	 * @param string $object_type Object type (post, user, term, comment).
+	 * @param string $direction   Sync direction ('to_meta', 'from_meta', 'both').
+	 *
+	 * @return bool Success status.
+	 */
+	public static function sync_with_meta( object $object, int $object_id, array $field_map, string $object_type = 'post', string $direction = 'to_meta' ): bool {
+		if ( empty( $object_id ) || empty( $field_map ) ) {
+			return false;
+		}
+
+		$success = true;
+
+		foreach ( $field_map as $property => $meta_key ) {
+			if ( $direction === 'to_meta' || $direction === 'both' ) {
+				if ( property_exists( $object, $property ) ) {
+					$result = update_metadata( $object_type, $object_id, $meta_key, $object->$property );
+					if ( ! $result ) {
+						$success = false;
+					}
+				}
+			}
+
+			if ( $direction === 'from_meta' || $direction === 'both' ) {
+				$meta_value = get_metadata( $object_type, $object_id, $meta_key, true );
+				if ( $meta_value !== false ) {
+					$object->$property = $meta_value;
+				}
+			}
+		}
+
+		return $success;
 	}
 
 	// ========================================
@@ -416,7 +459,7 @@ class Metas {
 		$values = [];
 		foreach ( $object_ids as $object_id ) {
 			$value = Meta::get_cast( $meta_type, $object_id, $meta_key, 'float', null );
-			if ( $value !== null && is_numeric( $value ) ) {
+			if ( is_numeric( $value ) ) {
 				$values[] = (float) $value;
 			}
 		}
